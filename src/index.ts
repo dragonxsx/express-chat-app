@@ -7,8 +7,6 @@ const port = process.env.PORT || 3000;
 const server  = http.createServer(app);
 const io = new Server(server);
 
-let count = 0;
-
 io.on('connection', (socket) => {
     console.log('New Websocket connection');
 
@@ -16,6 +14,10 @@ io.on('connection', (socket) => {
 
     socket.on('sendMessage', (msg) => {
         io.emit('message', msg);
+    })
+
+    socket.on('sendLocation', (position: {latitude: number, longitude: number}) => {
+        socket.broadcast.emit('message', `https://www.google.com/maps?q=${position.latitude},${position.longitude}`);
     })
 
     socket.on('disconnect', () => {
