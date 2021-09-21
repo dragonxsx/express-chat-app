@@ -16,8 +16,10 @@ io.on('connection', (socket) => {
         io.emit('message', msg);
     })
 
-    socket.on('sendLocation', (position: {latitude: number, longitude: number}) => {
+    socket.on('sendLocation', (position: {latitude: number, longitude: number}, callback: Function) => {
         socket.broadcast.emit('message', `https://www.google.com/maps?q=${position.latitude},${position.longitude}`);
+
+        callback({status: 'OK'});
     })
 
     socket.on('disconnect', () => {
