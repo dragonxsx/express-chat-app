@@ -13,8 +13,6 @@ io.on('connection', (socket) => {
     console.log('New Websocket connection');
 
     socket.on('join', (options, callback) => {
-        console.log(addUser); 
-        
         const {error, user} = addUser({id: socket.id, ...options});
 
         if(error) {
@@ -30,13 +28,25 @@ io.on('connection', (socket) => {
     })
 
     socket.on('sendMessage', (msg, callback) => {
-        io.emit('message', generateMessage(msg));
+        const user = getUser(socket.id);
+
+        if(!user?.room) {
+            return callback();
+        }
+
+        io.to(user.room).emit('message', generateMessage(msg, user.username));
 
         callback();
     })
 
     socket.on('sendLocation', (position: {latitude: number, longitude: number}, callback: Function) => {
-        io.emit('locationMessage', generateLocationMessage(position));
+        const user = getUser(socket.id);
+
+        if(!user?.room) {
+            return callback();
+        }
+        
+        io.to(user.room).emit('locationMessage', generateLocationMessage(user.username!, position));
 
         callback({status: 'OK'});
     })
